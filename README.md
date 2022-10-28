@@ -1,4 +1,4 @@
-# Swastha - 
+# Swastha - Your Health Companion
 
 Swastha is a health monitoring system, which would enable the user to overlook all of thier vital stats. These include
 - Heartbeat 
