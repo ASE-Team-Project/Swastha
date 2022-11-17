@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
     isSignedIn();
   }
 
-  void fetchHealth(String uuid) async {
+  Future fetchHealth(String uuid) async {
     //Health
     DateTime previous = DateTime.now();
     //DateTime previous = await fetchPreviousTime(uuid);
@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  void isSignedIn() async {
+  Future isSignedIn() async {
     setState(() {
       isLoggedIn = true;
     });
