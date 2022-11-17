@@ -4,11 +4,12 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:health/health.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HealthApp extends StatefulWidget {
   @override
@@ -23,6 +24,7 @@ class _HealthAppState extends State<HealthApp> {
   double _heartrate = 10;
   double _mgdl = 10.0;
   bool run_once = true;
+  late SharedPreferences preferences;
 
   // create a HealthFactory for use in the app
   HealthFactory health = HealthFactory();
@@ -74,7 +76,7 @@ class _HealthAppState extends State<HealthApp> {
     // note that strictly speaking, the [permissions] are not
     // needed, since we only want READ access.
     bool requested =
-    await health.requestAuthorization(types, permissions: permissions);
+        await health.requestAuthorization(types, permissions: permissions);
     print('requested: $requested');
 
     // If we are trying to read Step Count, Workout, Sleep or other data that requires
@@ -87,8 +89,7 @@ class _HealthAppState extends State<HealthApp> {
     if (requested) {
       try {
         // fetch health data
-        healthData =
-        await health.getHealthDataFromTypes(previous, now, types);
+        healthData = await health.getHealthDataFromTypes(previous, now, types);
         // save all the new data points (only the first 100)
       } catch (error) {
         print("Exception in getHealthDataFromTypes: $error");
@@ -101,7 +102,13 @@ class _HealthAppState extends State<HealthApp> {
       healthData.forEach((x) => print(x));
       List data = [];
       healthData.forEach((element) {
-        data.add(element.toJson());
+        Map s = element.toJson();
+        s["value"] = s["value"]["numericValue"];
+        s.remove("platform_type");
+        s.remove("source_name");
+        s.remove("source_id");
+        s.remove("device_id");
+        data.add(s);
       });
       return data;
       // update the UI to display the results
@@ -111,12 +118,12 @@ class _HealthAppState extends State<HealthApp> {
       return [];
     }
   }
-  Future printfunc() async{
+
+  Future printfunc() async {
     print("Print func running every 15 seconds");
     var duration = const Duration(seconds: 5);
     sleep(duration);
     print("Print func running every 15 seconds; After");
-
   }
 
   @override
@@ -126,23 +133,28 @@ class _HealthAppState extends State<HealthApp> {
   }
 }
 
-Future insertData(List results) async{
-  final DatabaseReference ref = FirebaseDatabase.instance.ref();
-  int i =0;
-  results.forEach((datapoint) {
-    String s = "datapoint" + i.toString();
-    i = i+1;
-    ref.child(s).set(datapoint);
-  });
+Future insertData(List results, String uuid) async {
+  print("UUID is : " + uuid);
+  if (uuid != "") {
+    // final DatabaseReference ref = FirebaseDatabase.instance.ref();
+    final CollectionReference ref = FirebaseFirestore.instance
+        .collection("data")
+        .doc(uuid)
+        .collection(uuid);
+    results.forEach((datapoint) {
+      print("Datapoint: ");
+      print(datapoint.toString());
+      ref.doc(DateTime.now().millisecondsSinceEpoch.toString()).set(datapoint);
+    });
+  }
 }
 
-Future fetchPreviousTime() async{
-  final DatabaseReference ref = FirebaseDatabase.instance.ref();
-  final snapshot = await ref.child('/healthdata/kC9B9MKAspZh4t6dOr7D').get();
-  if(snapshot.exists){
-    print(snapshot.value);
-  }
-  else{
-    print("data not found");
-  }
-}
+// Future<DateTime> fetchPreviousTime(String uuid) async {
+//   final CollectionReference ref =
+//       FirebaseFirestore.instance.collection("data").doc(uuid).collection(uuid);
+//   final docs = ref.get();
+//   if(docs.)
+//     else{
+//       return (DateTime(DateTime.now().day -7));
+//   }
+// }

@@ -1,43 +1,29 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 
-import 'HomePage.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'profile.dart';
+import 'dashboard.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'constants.dart';
+import 'SplashScreen.dart';
 import 'health.dart';
 
-import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(HealthApp());
-  //_HealthAppState obj = _HealthAppState();
-  //DateTime previous = await fetchPreviousTime();
-  DateTime previous = DateTime.now();
-  // while(true){
-  //   await fetchPreviousTime();
-  //   const duration = Duration(seconds: 10);
-  //   sleep(duration);
-  // }
-  while(true) {
-    DateTime now = DateTime.now();
-    List result = await HealthApp().obj.fetchDataEveryMinute(previous,now);
-    previous = now;
-    if(result.isNotEmpty){
-      await insertData(result);
-    }
-    const duration = Duration(seconds: 10);
-    sleep(duration);
-  }
-  //runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      //home: HomePage(),
-      home: HealthApp(),
+      title: 'Swastha',
+      theme: ThemeData.dark(),
+      home: SplashScreen(),
     );
   }
 }
