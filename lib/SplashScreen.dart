@@ -3,7 +3,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swastha/dashboard.dart';
-import 'profile.dart';
 import 'Widgets/ProgressWidget.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,6 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'health.dart';
 import 'dart:io';
+import "package:compute/compute.dart";
+import 'package:flutter_isolate/flutter_isolate.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -31,29 +32,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    isSignedIn();
+    //isSignedIn();
   }
 
-  Future fetchHealth(String uuid) async {
-    //Health
-    DateTime previous = DateTime.now();
-    //DateTime previous = await fetchPreviousTime(uuid);
-    // while(true){
-    //   await fetchPreviousTime();
-    //   const duration = Duration(seconds: 10);
-    //   sleep(duration);
-    // }
-    while (true) {
-      DateTime now = DateTime.now();
-      List result = await HealthApp().obj.fetchDataEveryMinute(previous, now);
-      previous = now;
-      if (result.isNotEmpty) {
-        await insertData(result, uuid);
-      }
-      const duration = Duration(seconds: 100);
-      sleep(duration);
-    }
-  }
 
   Future isSignedIn() async {
     setState(() {
@@ -64,9 +45,16 @@ class _SplashScreenState extends State<SplashScreen> {
     isLoggedIn = await googleSignIn.isSignedIn();
     if (isLoggedIn) {
       uuid = preferences.getString("id")!;
-      fetchHealth(uuid);
+      HealthApp healthapp = new HealthApp();
+      await healthapp.obj.fetchPermissions();
+      //flutterCompute(fetchHealth, healthapp);
+      fetchHealth(healthapp);
+
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => Dashboard()));
+    }
+    else{
+      controlSignIn();
     }
     setState(() {
       isLoading = false;
@@ -131,7 +119,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ),
-              onTap: controlSignIn,
+              onTap: isSignedIn,
             ),
             //Circular Progressbar
             Padding(
@@ -203,7 +191,10 @@ class _SplashScreenState extends State<SplashScreen> {
       setState(() {
         uuid = currentUser.uid;
       });
-      isSignedIn();
+      HealthApp healthapp = new HealthApp();
+      await healthapp.obj.fetchPermissions();
+      //flutterCompute(fetchHealth, healthapp);
+      fetchHealth(healthapp);
 
       Fluttertoast.showToast(msg: "SignIn Successful");
       setState(() {

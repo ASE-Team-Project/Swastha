@@ -25,14 +25,58 @@ class _HealthAppState extends State<HealthApp> {
   double _mgdl = 10.0;
   bool run_once = true;
   late SharedPreferences preferences;
+  bool requested = false;
 
   // create a HealthFactory for use in the app
   HealthFactory health = HealthFactory();
+  Future fetchPermissions() async{
 
+    final types = [
+      HealthDataType.HEART_RATE,
+      HealthDataType.BLOOD_OXYGEN,
+      HealthDataType.STEPS,
+      HealthDataType.WEIGHT,
+      HealthDataType.HEIGHT,
+      HealthDataType.BODY_MASS_INDEX,
+      HealthDataType.SLEEP_ASLEEP,
+      HealthDataType.SLEEP_AWAKE,
+      HealthDataType.SLEEP_IN_BED,
+      //HealthDataType.FLIGHTS_CLIMBED,
+      HealthDataType.DISTANCE_DELTA,
+      //HealthDataType.DISTANCE_WALKING_RUNNING,
+      HealthDataType.ACTIVE_ENERGY_BURNED,
+      //HealthDataType.BASAL_ENERGY_BURNED
+    ];
+
+    // with coresponsing permissions
+    final permissions = [
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      HealthDataAccess.READ,
+      //HealthDataAccess.READ,
+      //HealthDataAccess.READ,
+      //HealthDataAccess.READ,
+    ];
+
+    // get data within the last 24 hours
+    //final now = DateTime.now();
+    //final minuteago = DateTime(now.year, now.month, now.day,now.hour, now.minute -1);
+    // requesting access to the data types before reading them
+    // note that strictly speaking, the [permissions] are not
+    // needed, since we only want READ access.
+    //requested =  await health.requestAuthorization(types, permissions: permissions);
+    await Permission.activityRecognition.request();
+  }
   /// Fetch data points from the health plugin and show them in the app.
   Future fetchDataEveryMinute(DateTime previous, DateTime now) async {
-    print("Today Data");
-
     // define the types to get
     final types = [
       HealthDataType.HEART_RATE,
@@ -75,17 +119,8 @@ class _HealthAppState extends State<HealthApp> {
     // requesting access to the data types before reading them
     // note that strictly speaking, the [permissions] are not
     // needed, since we only want READ access.
-    bool requested =
-        await health.requestAuthorization(types, permissions: permissions);
-    print('requested: $requested');
-
-    // If we are trying to read Step Count, Workout, Sleep or other data that requires
-    // the ACTIVITY_RECOGNITION permission, we need to request the permission first.
-    // This requires a special request authorization call.
-    //
-    // The location permission is requested for Workouts using the Distance information.
-    await Permission.activityRecognition.request();
     List<HealthDataPoint> healthData = [];
+    requested = await health.requestAuthorization(types, permissions: permissions);
     if (requested) {
       try {
         // fetch health data
@@ -99,7 +134,6 @@ class _HealthAppState extends State<HealthApp> {
       healthData = HealthFactory.removeDuplicates(healthData);
 
       // print the results
-      healthData.forEach((x) => print(x));
       List data = [];
       healthData.forEach((element) {
         Map s = element.toJson();
@@ -110,21 +144,15 @@ class _HealthAppState extends State<HealthApp> {
         s.remove("device_id");
         data.add(s);
       });
-      return data;
+    return data;
       // update the UI to display the results
-      print("Fetched Data");
-    } else {
-      print("Authorization not granted");
+    }
+    else {
+      print("Authorisation not granted");
       return [];
     }
   }
 
-  Future printfunc() async {
-    print("Print func running every 15 seconds");
-    var duration = const Duration(seconds: 5);
-    sleep(duration);
-    print("Print func running every 15 seconds; After");
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,26 +163,155 @@ class _HealthAppState extends State<HealthApp> {
 
 Future insertData(List results, String uuid) async {
   print("UUID is : " + uuid);
+  await Firebase.initializeApp();
   if (uuid != "") {
     // final DatabaseReference ref = FirebaseDatabase.instance.ref();
-    final CollectionReference ref = FirebaseFirestore.instance
+    final DocumentReference ref = FirebaseFirestore.instance
         .collection("data")
-        .doc(uuid)
-        .collection(uuid);
+        .doc(uuid);
     results.forEach((datapoint) {
-      print("Datapoint: ");
-      print(datapoint.toString());
-      ref.doc(DateTime.now().millisecondsSinceEpoch.toString()).set(datapoint);
+      switch(datapoint["data_type"]) {
+        case "ACTIVE_ENERGY_BURNED":{
+          ref.collection("ACTIVE_ENERGY_BURNED").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "DISTANCE_DELTA":{
+          ref.collection("DISTANCE_DELTA").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "HEART_RATE":{
+          ref.collection("HEART_RATE").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "STEPS":{
+          ref.collection("STEPS").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "WEIGHT":{
+          ref.collection("WEIGHT").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "HEIGHT":{
+          ref.collection("HEIGHT").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "BODY_MASS_INDEX":{
+          ref.collection("BODY_MASS_INDEX").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "SLEEP_ASLEEP":{
+          ref.collection("SLEEP_ASLEEP").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "SLEEP_AWAKE":{
+          ref.collection("SLEEP_AWAKE").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "SLEEP_IN_BED":{
+          ref.collection("SLEEP_IN_BED").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "DISTANCE_DELTA":{
+          ref.collection("HEART_RATE").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+        case "BLOOD_OXYGEN":{
+          ref.collection("BLOOD_OXYGEN").doc(DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()).set(datapoint);
+          break;
+        }
+      }
     });
   }
 }
 
-// Future<DateTime> fetchPreviousTime(String uuid) async {
-//   final CollectionReference ref =
-//       FirebaseFirestore.instance.collection("data").doc(uuid).collection(uuid);
-//   final docs = ref.get();
-//   if(docs.)
-//     else{
-//       return (DateTime(DateTime.now().day -7));
-//   }
-// }
+@pragma('vm:entry-point')
+void fetchHealth(HealthApp healthapp) async {
+  //Health
+  final preferences = await SharedPreferences.getInstance();
+  String uuid = preferences.getString("id")!;
+
+  DateTime previous = await fetchPreviousTime(uuid);
+  // while (true) {
+    DateTime now = DateTime.now();
+    List result = await healthapp.obj.fetchDataEveryMinute(previous, now);
+    // previous = now;
+    if (result.isNotEmpty) {
+      await insertData(result, uuid);
+    }
+  //   const duration = Duration(seconds: 5);
+  //   sleep(duration);
+  // }
+}
+Future<DateTime> fetchPreviousTime(String uuid) async {
+  await Firebase.initializeApp();
+  DateTime past7days =  new DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day - 7
+  );
+  if (uuid != "") {
+    final CollectionReference ref = FirebaseFirestore.instance
+        .collection("data")
+        .doc(uuid).collection("ACTIVE_ENERGY_BURNED");
+    final data = await ref.orderBy('date_from', descending: true).limit(1).get();
+    final result = data.docs.map((e) => e.data());
+    if (result.isEmpty) {
+      return past7days;
+    }
+    else {
+      String date_from = result.toString().split("date_from: ")[1];
+      String time = date_from.split("T")[1];
+      date_from = date_from.split("T")[0];
+      DateTime date = DateTime(
+          int.parse(date_from.split("-")[0]),
+          int.parse(date_from.split("-")[1]),
+          int.parse(date_from.split("-")[2]),
+          int.parse(time.split(":")[0]),
+          int.parse(time.split(":")[1]),
+          int.parse(time.split(":")[2].split("})")[0].split(".")[0]),
+          int.parse(time.split(":")[2].split("})")[0].split(".")[0])
+      );
+      print("date_from: " + date.toString());
+      return date;
+    }
+  }
+  else {
+    return past7days;
+  }
+}

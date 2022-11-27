@@ -54,7 +54,8 @@ dependencies:
   cached_network_image: ^3.2.2
   animated_text_kit: ^4.2.2
   loading_animation_widget: ^1.2.0+3
-
+  compute: ^1.0.2
+  flutter_isolate: ^2.0.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
