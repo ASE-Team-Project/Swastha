@@ -64,7 +64,11 @@ class _DashboardState extends State<Dashboard> {
 
     setState(() {});
   }
-
+  Future<void> _pullRefresh() async {
+    HealthApp healthobj = new HealthApp();
+    healthobj.obj.fetchPermissions();
+    fetchHealth(healthobj);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,7 +101,9 @@ class _DashboardState extends State<Dashboard> {
           )
         ],
       ),
-      body: ListView(
+      body: RefreshIndicator(
+    onRefresh: _pullRefresh,
+    child: ListView(
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -328,7 +334,7 @@ class _DashboardState extends State<Dashboard> {
           )
         ],
       ),
-    );
+    ),);
   }
 }
 

@@ -88,11 +88,8 @@ class _HealthAppState extends State<HealthApp> {
       HealthDataType.SLEEP_ASLEEP,
       HealthDataType.SLEEP_AWAKE,
       HealthDataType.SLEEP_IN_BED,
-      //HealthDataType.FLIGHTS_CLIMBED,
       HealthDataType.DISTANCE_DELTA,
-      //HealthDataType.DISTANCE_WALKING_RUNNING,
       HealthDataType.ACTIVE_ENERGY_BURNED,
-      //HealthDataType.BASAL_ENERGY_BURNED
     ];
 
     // with coresponsing permissions
@@ -108,9 +105,6 @@ class _HealthAppState extends State<HealthApp> {
       HealthDataAccess.READ,
       HealthDataAccess.READ,
       HealthDataAccess.READ,
-      //HealthDataAccess.READ,
-      //HealthDataAccess.READ,
-      //HealthDataAccess.READ,
     ];
 
     // get data within the last 24 hours
@@ -169,6 +163,14 @@ Future insertData(List results, String uuid) async {
     final DocumentReference ref = FirebaseFirestore.instance
         .collection("data")
         .doc(uuid);
+    final documentdata = await ref.get();
+    String previoustime = "";
+    try{
+      previoustime = documentdata["timestamp"];
+    }
+    catch (e){
+      previoustime = "";
+    }
     results.forEach((datapoint) {
       switch(datapoint["data_type"]) {
         case "ACTIVE_ENERGY_BURNED":{
@@ -256,6 +258,16 @@ Future insertData(List results, String uuid) async {
           break;
         }
       }
+      var timestamp = {"timestamp": DateTime
+          .now()
+          .millisecondsSinceEpoch
+          .toString()};
+      if(previoustime != ""){
+        ref.update(timestamp);
+      }
+      else{
+        ref.set(timestamp);
+      }
     });
   }
 }
@@ -267,6 +279,7 @@ void fetchHealth(HealthApp healthapp) async {
   String uuid = preferences.getString("id")!;
 
   DateTime previous = await fetchPreviousTime(uuid);
+  print("Previous time: " + previous.toString());
   // while (true) {
     DateTime now = DateTime.now();
     List result = await healthapp.obj.fetchDataEveryMinute(previous, now);
@@ -286,30 +299,17 @@ Future<DateTime> fetchPreviousTime(String uuid) async {
       DateTime.now().day - 7
   );
   if (uuid != "") {
-    final CollectionReference ref = FirebaseFirestore.instance
+    final ref = await FirebaseFirestore.instance
         .collection("data")
-        .doc(uuid).collection("ACTIVE_ENERGY_BURNED");
-    final data = await ref.orderBy('date_from', descending: true).limit(1).get();
-    final result = data.docs.map((e) => e.data());
-    if (result.isEmpty) {
+        .doc(uuid).get();
+    String previoustime = "";
+    try{
+      previoustime = ref["timestamp"];
+    }
+    catch (e){
       return past7days;
     }
-    else {
-      String date_from = result.toString().split("date_from: ")[1];
-      String time = date_from.split("T")[1];
-      date_from = date_from.split("T")[0];
-      DateTime date = DateTime(
-          int.parse(date_from.split("-")[0]),
-          int.parse(date_from.split("-")[1]),
-          int.parse(date_from.split("-")[2]),
-          int.parse(time.split(":")[0]),
-          int.parse(time.split(":")[1]),
-          int.parse(time.split(":")[2].split("})")[0].split(".")[0]),
-          int.parse(time.split(":")[2].split("})")[0].split(".")[0])
-      );
-      print("date_from: " + date.toString());
-      return date;
-    }
+    return DateTime.fromMillisecondsSinceEpoch(int.parse(previoustime));
   }
   else {
     return past7days;
