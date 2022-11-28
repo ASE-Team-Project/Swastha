@@ -11,10 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:health/health.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class HealthApp extends StatefulWidget {
-  @override
-  _HealthAppState createState() => _HealthAppState();
-  _HealthAppState obj = _HealthAppState();
+   @override
+   _HealthAppState createState() => _HealthAppState();
+   _HealthAppState obj = _HealthAppState();
 }
 
 class _HealthAppState extends State<HealthApp> {
@@ -273,23 +274,25 @@ Future insertData(List results, String uuid) async {
 }
 
 @pragma('vm:entry-point')
-void fetchHealth(HealthApp healthapp) async {
-  //Health
+Future fetchHealth(HealthApp healthapp) async {
   final preferences = await SharedPreferences.getInstance();
-  String uuid = preferences.getString("id")!;
+  if(preferences.get("fetchrunning") == "false"){
+    preferences.setString("fetchrunning", "true");
+    //Health
+    String uuid = preferences.getString("id")!;
 
-  DateTime previous = await fetchPreviousTime(uuid);
-  print("Previous time: " + previous.toString());
-  // while (true) {
+    DateTime previous = await fetchPreviousTime(uuid);
+    print("Previous time: " + previous.toString());
     DateTime now = DateTime.now();
     List result = await healthapp.obj.fetchDataEveryMinute(previous, now);
-    // previous = now;
     if (result.isNotEmpty) {
       await insertData(result, uuid);
     }
-  //   const duration = Duration(seconds: 5);
-  //   sleep(duration);
-  // }
+    preferences.setString("fetchrunning", "false");
+  }
+  else{
+    print("Already Running");
+  }
 }
 Future<DateTime> fetchPreviousTime(String uuid) async {
   await Firebase.initializeApp();

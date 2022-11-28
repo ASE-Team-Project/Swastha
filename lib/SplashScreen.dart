@@ -12,6 +12,7 @@ import 'health.dart';
 import 'dart:io';
 import "package:compute/compute.dart";
 import 'package:flutter_isolate/flutter_isolate.dart';
+import "package:async_task/async_task.dart";
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -42,10 +43,11 @@ class _SplashScreenState extends State<SplashScreen> {
     });
 
     preferences = await SharedPreferences.getInstance();
+    await preferences.setString("fetchrunning", "false");
     isLoggedIn = await googleSignIn.isSignedIn();
+    final HealthApp healthapp = new HealthApp();
     if (isLoggedIn) {
       uuid = preferences.getString("id")!;
-      HealthApp healthapp = new HealthApp();
       await healthapp.obj.fetchPermissions();
       //flutterCompute(fetchHealth, healthapp);
       fetchHealth(healthapp);
@@ -54,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
           context, MaterialPageRoute(builder: (context) => Dashboard()));
     }
     else{
-      controlSignIn();
+      controlSignIn(healthapp);
     }
     setState(() {
       isLoading = false;
@@ -132,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Future controlSignIn() async {
+  Future controlSignIn(HealthApp healthapp) async {
     preferences = await SharedPreferences.getInstance();
     setState(() {
       isLoading = true;
@@ -191,7 +193,6 @@ class _SplashScreenState extends State<SplashScreen> {
       setState(() {
         uuid = currentUser.uid;
       });
-      HealthApp healthapp = new HealthApp();
       await healthapp.obj.fetchPermissions();
       //flutterCompute(fetchHealth, healthapp);
       fetchHealth(healthapp);
