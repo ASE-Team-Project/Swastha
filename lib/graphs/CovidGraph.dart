@@ -9,6 +9,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import 'NotificationService.dart';
+
 class CovidGraph extends StatefulWidget {
   @override
   _HomePage createState() => _HomePage();
@@ -24,6 +26,14 @@ class _HomePage extends State<CovidGraph> {
   AppState _state = AppState.DATA_NOT_FETCHED;
   List<CovidCases> datatot = [];
   //bool redraw = false;
+  late final NotificationService service;
+
+  void initState(){
+    service = NotificationService();
+    service.initializePlatformNotifications();
+    super.initState();
+  }
+
   getCovidData() async {
     var currentDate = DateTime(
         DateTime.now().year, DateTime.now().month, DateTime.now().day - 7);
@@ -33,13 +43,12 @@ class _HomePage extends State<CovidGraph> {
     var response = await Dio().get(
         'https://api.opencovid.ca/timeseries?stat=cases&stat=string&geo=can&loc=string&after=${afterDate}&fill=false&version=true&pt_names=short&hr_names=hruid&legacy=false&fmt=json');
     Map obj = jsonDecode(response.toString());
-    List<CovidCases> result = <CovidCases>[];
+      List<CovidCases> result = <CovidCases>[];
     obj["data"]["cases"].forEach((point) {
       Map cases = {};
       result.add(CovidCases(point["date"].toString(),
           double.parse(point["value_daily"].toString())));
     });
-
     return result;
 
     // list = rest.map<Cases>
@@ -54,6 +63,11 @@ class _HomePage extends State<CovidGraph> {
       print(element.date);
       print(element.value_daily);
     });
+
+    var lastValue = datatot.last;
+    if(lastValue.value_daily > 1) {
+      await service.showNotification(id: 0, title: 'Covid Alert', body:'Covid cases are rising. Please take necessary precautions.');
+    }
   }
 
   Widget _contentNoData() {
@@ -74,7 +88,7 @@ class _HomePage extends State<CovidGraph> {
   Widget _contentDataReady() {
     return SfCartesianChart(
       borderColor: Color(0xFFFAA916),
-      backgroundColor: Color(0xFFEFEFF0),
+      backgroundColor: Color(0xFF1A1A3F),
       borderWidth: 15,
       primaryXAxis: CategoryAxis(),
       title: ChartTitle(
