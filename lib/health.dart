@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -85,7 +86,7 @@ class _HealthAppState extends State<HealthApp> {
       HealthDataType.STEPS,
       HealthDataType.WEIGHT,
       HealthDataType.HEIGHT,
-      HealthDataType.BODY_MASS_INDEX,
+      //HealthDataType.BODY_MASS_INDEX,
       HealthDataType.SLEEP_ASLEEP,
       HealthDataType.SLEEP_AWAKE,
       HealthDataType.SLEEP_IN_BED,
@@ -105,7 +106,7 @@ class _HealthAppState extends State<HealthApp> {
       HealthDataAccess.READ,
       HealthDataAccess.READ,
       HealthDataAccess.READ,
-      HealthDataAccess.READ,
+      //HealthDataAccess.READ,
     ];
 
     // get data within the last 24 hours
@@ -172,102 +173,110 @@ Future insertData(List results, String uuid) async {
     catch (e){
       previoustime = "";
     }
-    results.forEach((datapoint) {
+    results.forEach((final datapoint) {
+      bool requiredtypes = false;
+      final HashMap<String,dynamic> x = HashMap<String,dynamic>.from(datapoint);
+      x["timestamp"] = DateTime.now().millisecondsSinceEpoch.toString();
       switch(datapoint["data_type"]) {
         case "ACTIVE_ENERGY_BURNED":{
           ref.collection("ACTIVE_ENERGY_BURNED").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
           break;
         }
         case "DISTANCE_DELTA":{
           ref.collection("DISTANCE_DELTA").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
           break;
         }
         case "HEART_RATE":{
           ref.collection("HEART_RATE").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
         case "STEPS":{
           ref.collection("STEPS").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
         case "WEIGHT":{
           ref.collection("WEIGHT").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
         case "HEIGHT":{
           ref.collection("HEIGHT").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
         case "BODY_MASS_INDEX":{
           ref.collection("BODY_MASS_INDEX").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
         case "SLEEP_ASLEEP":{
           ref.collection("SLEEP_ASLEEP").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
         case "SLEEP_AWAKE":{
           ref.collection("SLEEP_AWAKE").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
         case "SLEEP_IN_BED":{
           ref.collection("SLEEP_IN_BED").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
-          break;
-        }
-        case "DISTANCE_DELTA":{
-          ref.collection("HEART_RATE").doc(DateTime
-              .now()
-              .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
         case "BLOOD_OXYGEN":{
           ref.collection("BLOOD_OXYGEN").doc(DateTime
               .now()
               .millisecondsSinceEpoch
-              .toString()).set(datapoint);
+              .toString()).set(x);
+          requiredtypes = true;
           break;
         }
       }
-      var timestamp = {"timestamp": DateTime
-          .now()
-          .millisecondsSinceEpoch
-          .toString()};
-      if(previoustime != ""){
-        ref.update(timestamp);
-      }
-      else{
-        ref.set(timestamp);
+      if(requiredtypes) {
+        print("Required Types");
+        var timestamp = {"timestamp": DateTime
+            .now()
+            .millisecondsSinceEpoch
+            .toString()};
+        if (previoustime != "") {
+          ref.update(timestamp);
+        }
+        else {
+          ref.set(timestamp);
+        }
       }
     });
   }
