@@ -99,7 +99,7 @@ class _DashboardState extends State<Dashboard> {
         .doc(id)
         .collection("ACTIVE_ENERGY_BURNED");
     final calorieData =
-    await calorieRef.orderBy('date_from', descending: true).limit(1).get();
+        await calorieRef.orderBy('date_from', descending: true).limit(1).get();
     calorieData.docs.forEach((doc) {
       double value = double.parse(doc["value"]);
       value = value / 1000;
@@ -116,7 +116,7 @@ class _DashboardState extends State<Dashboard> {
         .doc(id)
         .collection("STEPS");
     final stepData =
-    await stepsRef.orderBy('date_from', descending: true).limit(1).get();
+        await stepsRef.orderBy('date_from', descending: true).limit(1).get();
     stepData.docs.forEach((doc) {
       // int value = int.parse(doc["value"]);
       //double val = value * 1000;
@@ -132,7 +132,7 @@ class _DashboardState extends State<Dashboard> {
         .doc(id)
         .collection("HEART_RATE");
     final heartdata =
-    await ref.orderBy('date_from', descending: true).limit(1).get();
+        await ref.orderBy('date_from', descending: true).limit(1).get();
 
     heartdata.docs.forEach((doc) {
       double value = double.parse(doc["value"]);
@@ -149,7 +149,7 @@ class _DashboardState extends State<Dashboard> {
         .doc(id)
         .collection("SLEEP_IN_BED");
     final sleepData =
-    await sleepRef.orderBy('date_from', descending: true).limit(1).get();
+        await sleepRef.orderBy('date_from', descending: true).limit(1).get();
     sleepData.docs.forEach((doc) {
       double value = double.parse(doc["value"]);
       print("sleepValue " + value.toString());
@@ -173,7 +173,7 @@ class _DashboardState extends State<Dashboard> {
         .doc(id)
         .collection("WEIGHT");
     final weightData =
-    await weightRef.orderBy('date_from', descending: true).limit(1).get();
+        await weightRef.orderBy('date_from', descending: true).limit(1).get();
     weightData.docs.forEach((doc) {
       double value = double.parse(doc["value"]);
       print("weightValue " + value.toString());
@@ -190,7 +190,7 @@ class _DashboardState extends State<Dashboard> {
         .doc(id)
         .collection("HEIGHT");
     final heightData =
-    await heightRef.orderBy('date_from', descending: true).limit(1).get();
+        await heightRef.orderBy('date_from', descending: true).limit(1).get();
     heightData.docs.forEach((doc) {
       double height = double.parse(doc["value"]);
       print("heightValue " + height.toString());
@@ -208,7 +208,7 @@ class _DashboardState extends State<Dashboard> {
         .doc(id)
         .collection("BLOOD_OXYGEN");
     final spo2Data =
-    await spo2Ref.orderBy('date_from', descending: true).limit(1).get();
+        await spo2Ref.orderBy('date_from', descending: true).limit(1).get();
     spo2Data.docs.forEach((doc) {
       double value = double.parse(doc["value"]);
       print("Spo2Value " + value.toString());
@@ -283,7 +283,7 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-      kBackgroundColor, //const Color(0xFF0A0D22), //Color(0xff181C1F),
+          kBackgroundColor, //const Color(0xFF0A0D22), //Color(0xff181C1F),
       appBar: AppBar(
         backgroundColor: Color(0xFF0A0D22), //const Color(0xff181C1F),
         title: const Text(
@@ -298,7 +298,7 @@ class _DashboardState extends State<Dashboard> {
           GestureDetector(
             child: Container(
               margin:
-              const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
               child: CircleAvatar(
                 radius: 20.0,
                 backgroundImage: NetworkImage(photoUrl),
@@ -401,13 +401,13 @@ class _DashboardState extends State<Dashboard> {
                             heartRate == ""
                                 ? circularProgressWhite()
                                 : Text(
-                              heartRate,
-                              style: const TextStyle(
-                                fontSize: 40.0,
-                                fontWeight: FontWeight.w900,
-                                fontFamily: 'Righteous',
-                              ),
-                            ),
+                                    heartRate,
+                                    style: const TextStyle(
+                                      fontSize: 40.0,
+                                      fontWeight: FontWeight.w900,
+                                      fontFamily: 'Righteous',
+                                    ),
+                                  ),
                             const Text(
                               "bpm",
                               style: TextStyle(
@@ -437,7 +437,7 @@ class _DashboardState extends State<Dashboard> {
                                   quarterTurns: 3,
                                   child: CircleAvatar(
                                     backgroundColor:
-                                    Colors.indigo, //Color(0xFF2E8BC0),
+                                        Colors.indigo, //Color(0xFF2E8BC0),
                                     radius: 30.0,
                                     child: FaIcon(
                                       FontAwesomeIcons.shoePrints,
@@ -452,9 +452,9 @@ class _DashboardState extends State<Dashboard> {
                                     steps == ""
                                         ? circularProgressWhite()
                                         : Text(
-                                      steps,
-                                      style: kHorizontalCardText,
-                                    ),
+                                            steps,
+                                            style: kHorizontalCardText,
+                                          ),
                                     const Text(
                                       "Steps Walked",
                                       style: TextStyle(
@@ -492,9 +492,9 @@ class _DashboardState extends State<Dashboard> {
                                   calorie == ""
                                       ? circularProgressWhite()
                                       : Text(
-                                    calorie,
-                                    style: kHorizontalCardText,
-                                  ),
+                                          calorie,
+                                          style: kHorizontalCardText,
+                                        ),
                                   Text(
                                     "kcal burnt",
                                     style: TextStyle(
@@ -547,12 +547,12 @@ class _DashboardState extends State<Dashboard> {
                                 sp02 == ""
                                     ? circularProgressWhite()
                                     : Text(
-                                  sp02,
-                                  style: const TextStyle(
-                                    fontSize: 28.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                        sp02,
+                                        style: const TextStyle(
+                                          fontSize: 28.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                               ],
                             ),
                           ),
@@ -610,12 +610,12 @@ class _DashboardState extends State<Dashboard> {
                                 bmi == ""
                                     ? circularProgressWhite()
                                     : Text(
-                                  bmi,
-                                  style: const TextStyle(
-                                    fontSize: 28.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                        bmi,
+                                        style: const TextStyle(
+                                          fontSize: 28.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                               ],
                             ),
                           ),
@@ -675,12 +675,12 @@ class _DashboardState extends State<Dashboard> {
                                 sleepDuration == ""
                                     ? circularProgressWhite()
                                     : Text(
-                                  sleepDuration,
-                                  style: const TextStyle(
-                                    fontSize: 28.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                        sleepDuration,
+                                        style: const TextStyle(
+                                          fontSize: 28.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                               ],
                             ),
                           ),
@@ -751,7 +751,7 @@ class _DashboardState extends State<Dashboard> {
                               radius: 50.0,
                               child: CircleAvatar(
                                 backgroundColor:
-                                Colors.white, //Color(0xFF78ADFD),
+                                    Colors.white, //Color(0xFF78ADFD),
                                 radius: 35.0,
                                 child: FaIcon(
                                   FontAwesomeIcons.virusCovid,
