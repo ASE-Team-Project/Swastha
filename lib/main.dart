@@ -1,3 +1,30 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'profile.dart';
+import 'dashboard.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'constants.dart';
+import 'SplashScreen.dart';
+import 'health.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Swastha',
+      theme: ThemeData.dark(),
+      home: SplashScreen(),
+=======
 import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
@@ -495,125 +522,7 @@ class _HealthAppState extends State<HealthApp> {
           ),
         ),
       ),
+
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:health/health.dart';
-// import 'dart:async';
-
-// void main() {
-//   runApp(MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: Scaffold(
-//         backgroundColor: Color(0xFFFF5758),
-//         body: SafeArea(
-//           child: Column(
-//             children: [
-//               CircleAvatar(
-//                 radius: 50,
-//                 backgroundImage: NetworkImage(
-//                     'https://www.shivambhosale.com/img/shivam2.jpeg'),
-//               ),
-//               Text(
-//                 "Shivam Bhosale",
-//                 style: TextStyle(
-//                     fontWeight: FontWeight.bold,
-//                     fontSize: 30,
-//                     color: Color(0xFFFFFFFC)),
-//               ),
-//               SizedBox(
-//                 height: 20.0,
-//                 width: 150.0,
-//                 child: Divider(
-//                   color: Colors.white,
-//                 ),
-//               ),
-//               Card(
-//                 color: Colors.white,
-//                 shadowColor: Colors.black,
-//                 margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-//                 // padding: EdgeInsets.all(10.0), Unlike Containers Cards do not have padding property.
-//                 // Instead of that we can use the padding class to encompass the row widget.
-//                 child: Padding(
-//                   padding: const EdgeInsets.all(8.0),
-//                   child: ListTile(
-//                     leading: Icon(
-//                       Icons.monitor_heart,
-//                       color: Colors.black,
-//                       size: 30,
-//                     ),
-//                     title: Text("BPM: $",
-//                         style: TextStyle(fontSize: 30, color: Colors.black)),
-//                   ),
-//                 ),
-//               ),
-//               Card(
-//                 color: Colors.white,
-//                 shadowColor: Colors.black,
-//                 margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-//                 // padding: EdgeInsets.all(10.0), Unlike Containers Cards do not have padding property.
-//                 // Instead of that we can use the padding class to encompass the row widget.
-//                 child: Padding(
-//                   padding: const EdgeInsets.all(8.0),
-//                   child: ListTile(
-//                     leading: Icon(
-//                       Icons.bloodtype,
-//                       color: Colors.black,
-//                       size: 30,
-//                     ),
-//                     title: Text("SpO2: 98",
-//                         style: TextStyle(fontSize: 30, color: Colors.black)),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-//
-// Widget build(BuildContext context) {
-//   return MaterialApp(
-//     home: Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Health Example'),
-//           actions: <Widget>[
-//             IconButton(
-//               icon: Icon(Icons.file_download),
-//               onPressed: () {
-//                 fetchData();
-//               },
-//             ),
-//             IconButton(
-//               onPressed: () {
-//                 addData();
-//               },
-//               icon: Icon(Icons.add),
-//             ),
-//             IconButton(
-//               onPressed: () {
-//                 fetchBloodOxygenData();
-//                 fetchHeartBeatData();
-//                 // fetchStepData();
-//               },
-//               icon: Icon(Icons.nordic_walking),
-//             )
-//           ],
-//         ),
-//         body: Center(
-//           child: _content(),
-//         )),
-//   );
-// }
-// }
